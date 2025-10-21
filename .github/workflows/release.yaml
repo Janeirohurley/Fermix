@@ -1,9 +1,10 @@
-name: Build and Release Desktop App
+name: Build and Release Electron App
 
 on:
   push:
     tags:
       - 'v*'   # Ex: v1.0.0
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,23 +22,29 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
-      - name: Build Vite app
-        run: npm run build
+      - name: Build frontend
+        run: pnpm build
 
       - name: Package Electron app
-        run: npm run dist
+        run: pnpm dist
         env:
-          # Facultatif — si tu signes l’app
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
 
-      - name: Upload build artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-build
@@ -49,7 +56,7 @@ jobs:
     needs: build
 
     steps:
-      - name: Download artifacts from builds
+      - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
           path: release-assets
