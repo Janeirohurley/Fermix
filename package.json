@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Fermix desktop app",
+  "author": "Janeiro hurley <ndabubahajanvier@gmail.com>",
   "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
@@ -58,9 +59,8 @@
       "electron/**/*",
       "package.json"
     ],
-    "asar": {
-      "unpack": "electron/assets/**"
-    },
+    "asar": true,
+    "asarUnpack": "electron/assets/**",
     "icon": "electron/assets/icon.png",
     "win": {
       "target": "nsis"
