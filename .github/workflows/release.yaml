@@ -15,43 +15,35 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      # 1️⃣ Cloner le dépôt
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Installer Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
 
-      # 3️⃣ Installer pnpm
+      # ✅ Installation correcte de pnpm
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
 
-      # 4️⃣ Installer les dépendances
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # 5️⃣ Builder le frontend (Vite)
       - name: Build frontend
         run: pnpm build
 
-      # 6️⃣ Builder Electron
       - name: Package Electron app
         run: pnpm dist
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # 🧩 important pour publier sur GitHub
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
 
-      # 7️⃣ Uploader les builds comme artefacts
-      - name: Upload build artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-build
@@ -63,18 +55,14 @@ jobs:
     needs: build
 
     steps:
-      # 8️⃣ Télécharger les artefacts créés par les builds
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
           path: release-assets
 
-      # 9️⃣ Créer la Release GitHub + attacher les fichiers
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}     # 🔥 important pour prendre le tag poussé
-          name: Release ${{ github.ref_name }}
           files: release-assets/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

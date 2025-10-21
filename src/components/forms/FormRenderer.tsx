@@ -82,7 +82,7 @@ const FormRenderer: React.FC<Props> = ({
         return;
       }
       const value = formData.find((f) => f.id === field.id)?.value;
-      const { valid, error } = validateField(field, value, formData.reduce((acc, f) => ({ ...acc, [f.id]: f.value }), {}));
+      const { valid, error } = validateField(field, value);
       newErrors[field.id] = valid ? null : error || 'Erreur inconnue';
     });
     setErrors(newErrors);
@@ -297,7 +297,7 @@ const FormRenderer: React.FC<Props> = ({
         const FieldIcon = getFieldTypeIcon(field.type);
         return (
           <div key={field.id}>
-            <label htmlFor={field.id} className="block text-sm font-medium text-gray-300 mb-1 flex items-center gap-2">
+            <label htmlFor={field.id} className=" text-sm font-medium text-gray-300 mb-1 flex items-center gap-2">
               <div className="w-6 h-6 rounded-md flex items-center justify-center bg-blue-600">
                 <FieldIcon className="w-4 h-4 text-white" />
               </div>
@@ -356,7 +356,7 @@ const FormRenderer: React.FC<Props> = ({
         const FieldIcon = getFieldTypeIcon(field.type);
         groupedElements.push(
           <div key={field.id}>
-            <label htmlFor={field.id} className="block text-sm font-medium text-gray-300 mb-1 flex items-center gap-2">
+            <label htmlFor={field.id} className=" text-sm font-medium text-gray-300 mb-1 flex items-center gap-2">
               <div className="w-6 h-6 rounded-md flex items-center justify-center bg-blue-600">
                 <FieldIcon className="w-4 h-4 text-white" />
               </div>

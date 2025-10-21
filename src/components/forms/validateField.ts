@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { FormField } from './types/formTypes'; // Adapté selon ton chemin
 
@@ -10,7 +9,6 @@ type ValidationResult = {
 export const validateField = (
     field: FormField,
     value: any,
-    allValues: Record<string, any>
 ): ValidationResult => {
     const rules = field.validation || {};
     const label = field.label;

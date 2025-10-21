@@ -409,7 +409,7 @@ const FormsManagement = () => {
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
-                            onClick={() => handleDelete(form.id)}
+                            onClick={() => handleDelete(Number(form.id))}
                             className="p-2 bg-red-950 text-red-400 rounded-md hover:bg-red-900 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
