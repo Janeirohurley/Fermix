@@ -1,13 +1,16 @@
 {
   "name": "fermix",
+  "version": "1.0.3",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "description": "Fermix desktop app",
+  "main": "electron/main.js",            
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "start": "electron .",               
     "dist": "pnpm build && electron-builder --publish never"
   },
   "dependencies": {
@@ -43,5 +46,30 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.45.0",
     "vite": "^7.1.7"
+  },
+  "build": {
+    "appId": "com.fermix.local",          
+    "productName": "Fermix",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",                        
+      "electron/**/*",                   
+      "package.json"
+    ],
+    "asar": false,
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "publish": {
+      "provider": "github"
+    }
   }
 }
