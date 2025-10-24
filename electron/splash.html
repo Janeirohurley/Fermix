@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fermix Splash</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top right, #6a11cb, #2575fc 70%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    /* --- Effet de particules --- */
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      animation: float 6s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; }
+      50% { transform: translateY(-50px) scale(1.2); opacity: 1; }
+    }
+
+    /* --- Contenu principal --- */
+    .container {
+      text-align: center;
+      color: #fff;
+      z-index: 2;
+      animation: fadeIn 2.5s ease-out forwards;
+    }
+
+    .logo {
+      width: 140px;
+      height: 140px;
+      margin-bottom: 20px;
+      animation: pulse 3s infinite ease-in-out;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.6));
+      border-radius: 20px;
+    }
+
+    h1 {
+      font-size: 2.4em;
+      font-weight: 700;
+      letter-spacing: 2px;
+      animation: slideIn 1.5s ease-out;
+    }
+
+    .tagline {
+      margin-top: 5px;
+      font-size: 1em;
+      font-weight: 400;
+      opacity: 0.8;
+      animation: fadeIn 3s ease-in-out;
+    }
+
+    /* --- Barre de chargement + pourcentage --- */
+    .progress-container {
+      width: 250px;
+      height: 8px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      margin: 30px auto 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #fff, #9ad0ff);
+      border-radius: 10px;
+      transition: width 0.2s ease-in-out;
+    }
+
+    .percent {
+      margin-top: 10px;
+      font-size: 1em;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+    /* --- Animations clés --- */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(255,255,255,0.3); }
+      50% { box-shadow: 0 0 20px rgba(255,255,255,0.8); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideIn {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Particules décoratives -->
+  <script>
+    for (let i = 0; i < 25; i++) {
+      const particle = document.createElement('div');
+      const size = Math.random() * 6 + 4;
+      particle.classList.add('particle');
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 100}%`;
+      particle.style.animationDuration = `${3 + Math.random() * 3}s`;
+      particle.style.animationDelay = `${Math.random() * 2}s`;
+      document.body.appendChild(particle);
+    }
+  </script>
+
+  <div class="container">
+    <img class="logo" src="assets/icon.png" alt="Fermix Logo">
+    <h1>Fermix</h1>
+    <div class="tagline">Smart Farming • Data for Every Breed</div>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="percent" id="percent">0%</div>
+  </div>
+
+  <script>
+    let progress = 0;
+    const progressBar = document.getElementById('progress-bar');
+    const percentText = document.getElementById('percent');
+
+    const loading = setInterval(() => {
+      if (progress < 100) {
+        progress += Math.floor(Math.random() * 5) + 1; // incrément aléatoire
+        if (progress > 100) progress = 100;
+        progressBar.style.width = `${progress}%`;
+        percentText.textContent = `${progress}%`;
+      } else {
+        clearInterval(loading);
+        // Optionnel : transition vers app principale
+        setTimeout(() => {
+          document.body.style.transition = "opacity 1s ease";
+          document.body.style.opacity = 0;
+          // simulate app launch
+          // window.location.href = "app.html"; 
+        }, 600);
+      }
+    }, 200);
+  </script>
+</body>
+</html>

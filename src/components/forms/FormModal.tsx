@@ -33,8 +33,8 @@ const FormModal = ({
   const [groupes, setGroupes] = useState<FormGroup[]>(form?.groupes || []);
 
   // ID du template (généré si création)
-  const templateId = form?.id || `temp_${Date.now()}`;
-
+  const templateId = form?.id || Date.now().toString();
+console.log({templateId,form})
   // === Prévisualisation en temps réel ===
   // === Prévisualisation en temps réel ===
   useEffect(() => {
@@ -133,6 +133,7 @@ const FormModal = ({
       created_at: form?.created_at || new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
+    console.log(newForm)
     onSave(newForm);
   };
 

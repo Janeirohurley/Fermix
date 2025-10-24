@@ -1,6 +1,8 @@
 import Dexie from "dexie";
 import type { FormType, FormTemplate } from '../components/forms/types/formTypes';
 
+export type { FormType, FormTemplate };
+
 export interface FormSubmission {
     id?: number;
     formId: number;
@@ -12,7 +14,7 @@ export interface FormSubmission {
 
 export class LocalDB extends Dexie {
     formTypes!: Dexie.Table<FormType, string>;
-    formTemplates!: Dexie.Table<FormTemplate, number>;
+    formTemplates!: Dexie.Table<FormTemplate, string>;
     formSubmissions!: Dexie.Table<FormSubmission, number>;
 
     constructor() {
@@ -20,7 +22,7 @@ export class LocalDB extends Dexie {
 
         this.version(2).stores({
             formTypes: "id,nom,actif,created_at,updated_at",
-            formTemplates: "++id,nom,type,actif,created_at,updated_at",
+            formTemplates: "id,nom,type,actif,created_at,updated_at",
             formSubmissions: "++id,formId,formName,submittedAt,status",
         });
     }

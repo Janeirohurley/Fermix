@@ -31,7 +31,7 @@ export const apiService = {
 
   // ---------- FormTemplate (Forms dynamiques) ----------
   getForms: async (): Promise<FormTemplate[]> => db.formTemplates.toArray(),
-  getForm: async (id: number): Promise<FormTemplate | undefined> => db.formTemplates.get(id),
+  getForm: async (id: string): Promise<FormTemplate | undefined> => db.formTemplates.get(id),
   createForm: async (data: Partial<FormTemplate>): Promise<FormTemplate> => {
     const newFormData = {
       id: data.id || Date.now(),
@@ -52,11 +52,12 @@ export const apiService = {
     }
     return newForm;
   },
-  updateForm: async (id: number, data: Partial<FormTemplate>): Promise<FormTemplate | undefined> => {
+  updateForm: async (id: string, data: Partial<FormTemplate>): Promise<FormTemplate | undefined> => {
+    console.log("Updating form", id, data);
     await db.formTemplates.update(id, { ...data, updated_at: new Date().toISOString() });
     return db.formTemplates.get(id);
   },
-  deleteForm: async (id: number): Promise<void> => {
+  deleteForm: async (id: string): Promise<void> => {
     await db.formTemplates.delete(id);
   },
 

@@ -1,11 +1,12 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect } from 'react';
-import { Send, Upload, Link } from 'lucide-react';
+import { Send, Upload, Link, AlertCircle } from 'lucide-react';
 import { validateField } from './validateField';
 import { shouldShowField } from './shouldShowField';
 import type { FormField, FormGroup } from './types/formTypes';
 import FilePreviewList from './FilePreviewList';
+import { motion } from 'framer-motion';
 import { getFieldTypeIcon } from './utils/utils';
 
 type FormFieldEntry = {
@@ -21,7 +22,6 @@ interface Props {
   setFormData: React.Dispatch<React.SetStateAction<FormFieldEntry[]>>;
   handleSubmit?: (e: React.FormEvent) => void;
   isSubmitting?: boolean;
-  setSelectedForm?: (val: any) => void;
   errors: Record<string, string | null>;
   setErrors: React.Dispatch<React.SetStateAction<Record<string, string | null>>>;
   isPreview?: boolean; // Added to disable submission in preview mode
@@ -34,7 +34,7 @@ const FormRenderer: React.FC<Props> = ({
   setFormData,
   handleSubmit,
   isSubmitting = false,
-  setSelectedForm,
+
   errors,
   setErrors,
   isPreview = false,
@@ -87,7 +87,7 @@ const FormRenderer: React.FC<Props> = ({
     });
     setErrors(newErrors);
   }, [formData, formFields, setErrors]);
-
+  //componnents that combine and rend fild by their type
   const renderField = (field: FormField) => {
     const isVisible = shouldShowField(field, formData.reduce((acc, f) => ({ ...acc, [f.id]: f.value }), {}));
     if (!isVisible) return null;
@@ -101,96 +101,81 @@ const FormRenderer: React.FC<Props> = ({
       case 'tel':
       case 'password':
         return (
-          <div key={field.id} className="mb-4">
-            <input
-              type={field.type}
-              id={field.id}
-              value={value}
-              onChange={(e) => handleInputChange(field.id, field.label, e.target.value)}
-              className={`w - full px - 3 py - 2 bg - gray - 700 border ${error ? 'border-red-500' : 'border-gray-600'} rounded - md focus: outline - none focus: ring - 2 ${error ? 'focus:ring-red-400' : 'focus:ring-blue-500'} focus: border - transparent text - gray - 100 placeholder - gray - 500 transition - all duration - 200`}
-              placeholder={field.placeholder}
-              required={field.obligatoire}
-              disabled={isPreview}
-            />
-            {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
-          </div>
+          <input
+            type={field.type}
+            id={field.id}
+            value={value}
+            onChange={(e) => handleInputChange(field.id, field.label, e.target.value)}
+            className={`w-full px-3 py-2 bg-gray-700 border ${error ? 'border-red-500' : 'border-gray-600'} rounded-md focus:outline-none focus:ring-1 ${error ? 'focus:ring-red-400' : 'focus:ring-blue-500'} focus:border-transparent text-gray-100 placeholder-gray-500 transition-all duration-200`}
+            placeholder={field.placeholder}
+            required={field.obligatoire}
+            disabled={isPreview}
+          />
         );
 
       case 'textarea':
         return (
-          <div key={field.id} className="mb-4">
-            <textarea
-              id={field.id}
-              value={value}
-              onChange={(e) => handleInputChange(field.id, field.label, e.target.value)}
-              rows={4}
-              className={`w - full px - 3 py - 2 bg - gray - 700 border ${error ? 'border-red-500' : 'border-gray-600'} rounded - md focus: outline - none focus: ring - 2 ${error ? 'focus:ring-red-400' : 'focus:ring-blue-500'} focus: border - transparent text - gray - 100 placeholder - gray - 500 transition - all duration - 200 resize - none`}
-              placeholder={field.placeholder}
-              required={field.obligatoire}
-              disabled={isPreview}
-            />
-            {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
-          </div>
+          <textarea
+            id={field.id}
+            value={value}
+            onChange={(e) => handleInputChange(field.id, field.label, e.target.value)}
+            rows={4}
+            className={`w-full px-3 py-2 bg-gray-700 border ${error ? 'border-red-500' : 'border-gray-600'} rounded-md focus:outline-none focus:ring-1 ${error ? 'focus:ring-red-400' : 'focus:ring-blue-500'} focus:border-transparent text-gray-100 placeholder-gray-500 transition-all duration-200 resize-none`}
+            placeholder={field.placeholder}
+            required={field.obligatoire}
+            disabled={isPreview}
+          />
         );
 
       case 'number':
         return (
-          <div key={field.id} className="mb-4">
-            <input
-              type="number"
-              id={field.id}
-              value={value}
-              onChange={(e) => handleInputChange(field.id, field.label, e.target.value === '' ? '' : parseInt(e.target.value))}
-              className={`w - full px - 3 py - 2 bg - gray - 700 border ${error ? 'border-red-500' : 'border-gray-600'} rounded - md focus: outline - none focus: ring - 2 ${error ? 'focus:ring-red-400' : 'focus:ring-blue-500'} focus: border - transparent text - gray - 100 placeholder - gray - 500 transition - all duration - 200`}
-              placeholder={field.placeholder}
-              required={field.obligatoire}
-              min={field.validation?.min}
-              max={field.validation?.max}
-              step={field.validation?.step}
-              disabled={isPreview}
-            />
-            {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
-          </div>
+          <input
+            type="number"
+            id={field.id}
+            value={value}
+            onChange={(e) => handleInputChange(field.id, field.label, e.target.value === '' ? '' : parseInt(e.target.value))}
+            className={`w-full px-3 py-2 bg-gray-700 border ${error ? 'border-red-500' : 'border-gray-600'} rounded-md focus:outline-none focus:ring-1 ${error ? 'focus:ring-red-400' : 'focus:ring-blue-500'} focus:border-transparent text-gray-100 placeholder-gray-500 transition-all duration-200`}
+            placeholder={field.placeholder}
+            required={field.obligatoire}
+            min={field.validation?.min}
+            max={field.validation?.max}
+            step={field.validation?.step}
+            disabled={isPreview}
+          />
         );
 
       case 'date':
         return (
-          <div key={field.id} className="mb-4">
-            <input
-              type="date"
-              id={field.id}
-              value={value}
-              onChange={(e) => handleInputChange(field.id, field.label, e.target.value)}
-              className={`w - full px - 3 py - 2 bg - gray - 700 border ${error ? 'border-red-500' : 'border-gray-600'} rounded - md focus: outline - none focus: ring - 2 ${error ? 'focus:ring-red-400' : 'focus:ring-blue-500'} focus: border - transparent text - gray - 100 transition - all duration - 200`}
-              required={field.obligatoire}
-              max={field.validation?.maxDate}
-              min={field.validation?.minDate}
-              disabled={isPreview}
-            />
-            {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
-          </div>
+          <input
+            type="date"
+            id={field.id}
+            value={value}
+            onChange={(e) => handleInputChange(field.id, field.label, e.target.value)}
+            className={`w-full px-3 py-2 bg-gray-700 border ${error ? 'border-red-500' : 'border-gray-600'} rounded-md focus:outline-none focus:ring-1 ${error ? 'focus:ring-red-400' : 'focus:ring-blue-500'} focus:border-transparent text-gray-100 placeholder-gray-500 transition-all duration-200`}
+            required={field.obligatoire}
+            max={field.validation?.maxDate}
+            min={field.validation?.minDate}
+            disabled={isPreview}
+          />
         );
 
       case 'select':
         return (
-          <div key={field.id} className="mb-4">
-            <select
-              id={field.id}
-              value={value}
-              onChange={(e) => handleInputChange(field.id, field.label, e.target.value)}
-              className={`w - full px - 3 py - 2 bg - gray - 700 border ${error ? 'border-red-500' : 'border-gray-600'} rounded - md focus: outline - none focus: ring - 2 ${error ? 'focus:ring-red-400' : 'focus:ring-blue-500'} focus: border - transparent text - gray - 100 transition - all duration - 200`}
-              required={field.obligatoire}
-              disabled={isPreview}
-            >
-              <option value="">Sélectionnez une option</option>
-              {field.options?.map((option, index) => (
-                <option key={index} value={typeof option === 'string' ? option : option.value}>
-                  {typeof option === 'string' ? option : option.label}
-                </option>
-              ))}
-            </select>
-            {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
-          </div>
+          <select
+            id={field.id}
+            value={value}
+            onChange={(e) => handleInputChange(field.id, field.label, e.target.value)}
+            className={`w-full px-3 py-2 bg-gray-700 border ${error ? 'border-red-500' : 'border-gray-600'} rounded-md focus:outline-none focus:ring-1 ${error ? 'focus:ring-red-400' : 'focus:ring-blue-500'} focus:border-transparent text-gray-100 transition-all duration-200`}
+            required={field.obligatoire}
+            disabled={isPreview}
+          >
+            <option value="">Sélectionnez une option</option>
+            {field.options?.map((option, index) => (
+              <option key={index} value={typeof option === 'string' ? option : option.value}>
+                {typeof option === 'string' ? option : option.label}
+              </option>
+            ))}
+          </select>
         );
 
       case 'radio':
@@ -289,23 +274,33 @@ const FormRenderer: React.FC<Props> = ({
         return null;
     }
   };
-
+  //grouped fiel
   const renderGroupedFields = () => {
     if (!groupes || groupes.length === 0) {
       // Render fields without groups
-      return formFields.map((field) => {
+      return formFields.map((field, index) => {
         const FieldIcon = getFieldTypeIcon(field.type);
         return (
-          <div key={field.id}>
-            <label htmlFor={field.id} className=" text-sm font-medium text-gray-300 mb-1 flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md flex items-center justify-center bg-blue-600">
-                <FieldIcon className="w-4 h-4 text-white" />
-              </div>
-              {field.label}
-              {field.obligatoire && <span className="text-red-400 ml-1">*</span>}
-            </label>
-            {renderField(field)}
-          </div>
+          <>
+            {renderField(field) !== null &&
+              <motion.div
+                key={field.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <label htmlFor={field.id} className=" text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-md flex items-center justify-center bg-blue-600">
+                    <FieldIcon className="w-4 h-4 text-white" />
+                  </div>
+                  {renderField(field) !== null && field.label}
+                  {field.obligatoire && <span className="text-red-400 ml-1">*</span>}
+                </label>
+                {renderField(field)}
+              </motion.div>
+            }
+          </>
+
         );
       });
     }
@@ -326,21 +321,37 @@ const FormRenderer: React.FC<Props> = ({
               <Link className="w-4 h-4" />
               {group.name}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-gray-900/50 border border-indigo-700 rounded-md">
-              {groupFields.map((field) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 p-4 bg-gray-900/50 border border-indigo-700 rounded-md">
+              {groupFields.map((field, index) => {
                 processedFields.add(field.id);
                 const FieldIcon = getFieldTypeIcon(field.type);
                 return (
-                  <div key={field.id} className="space-y-2">
-                    <label htmlFor={field.id} className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-md flex items-center justify-center bg-indigo-600">
-                        <FieldIcon className="w-4 h-4 text-white" />
-                      </div>
-                      {field.label}
-                      {field.obligatoire && <span className="text-red-400 ml-1">*</span>}
-                    </label>
-                    {renderField(field)}
-                  </div>
+                  <>
+                    {renderField(field) !== null &&
+                      <motion.div
+                        key={field.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="space-y-2">
+                        <label htmlFor={field.id} className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-md flex items-center justify-center bg-indigo-600">
+                            <FieldIcon className="w-4 h-4 text-white" />
+                          </div>
+                          {renderField(field) !== null && field.label}
+                          {field.obligatoire && <span className="text-red-400 ml-1">*</span>}
+                        </label>
+                        {renderField(field)}
+                        {errors[field.id] && (
+                          <div className="flex items-center gap-2 text-red-400 text-xs">
+                            <AlertCircle className="w-4 h-4" />
+                            {errors[field.id]}
+                          </div>
+                        )}
+                      </motion.div>
+                    }
+                  </>
+
                 );
               })}
             </div>
@@ -352,19 +363,29 @@ const FormRenderer: React.FC<Props> = ({
     // Add any remaining fields not in groups
     const remainingFields = formFields.filter((field) => !processedFields.has(field.id));
     if (remainingFields.length > 0) {
-      remainingFields.forEach((field) => {
+      remainingFields.forEach((field, index) => {
         const FieldIcon = getFieldTypeIcon(field.type);
         groupedElements.push(
-          <div key={field.id}>
-            <label htmlFor={field.id} className=" text-sm font-medium text-gray-300 mb-1 flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md flex items-center justify-center bg-blue-600">
-                <FieldIcon className="w-4 h-4 text-white" />
-              </div>
-              {field.label}
-              {field.obligatoire && <span className="text-red-400 ml-1">*</span>}
-            </label>
-            {renderField(field)}
-          </div>
+          <>
+            {renderField(field) !== null &&
+              <motion.div
+                key={field.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <label htmlFor={field.id} className=" text-sm font-medium text-gray-300 mb-1 flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-md flex items-center justify-center bg-blue-600">
+                    <FieldIcon className="w-4 h-4 text-white" />
+                  </div>
+                  {field.label}
+                  {field.obligatoire && <span className="text-red-400 ml-1">*</span>}
+                </label>
+                {renderField(field)}
+              </motion.div>
+            }
+          </>
+
         );
       });
     }
@@ -375,7 +396,6 @@ const FormRenderer: React.FC<Props> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-gray-900 rounded-lg shadow-md p-4"
     >
       <div className="space-y-4">
         {renderGroupedFields()}
@@ -383,14 +403,7 @@ const FormRenderer: React.FC<Props> = ({
       {!isPreview && (
         <div className="mt-6 pt-4 border-t border-gray-700">
           <div className="flex flex-col sm:flex-row gap-3 justify-end">
-            <button
-              type="button"
-              onClick={() => setSelectedForm && setSelectedForm(null)}
-              className="px-4 py-2 border border-gray-600 text-gray-300 rounded-md hover:bg-gray-700 transition-colors text-sm"
-              disabled={isSubmitting}
-            >
-              Annuler
-            </button>
+
             <button
               type="submit"
               disabled={isSubmitting}

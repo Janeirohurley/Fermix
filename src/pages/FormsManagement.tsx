@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   Plus,
@@ -21,6 +21,7 @@ import type { FormTemplate, FormType } from '../components/forms/types/formTypes
 import { apiService } from '../services/api';
 import { getDynamicIconComponent } from '../utils/getDynamicIconComponent';
 import FormModal from '../components/forms/FormModal';
+import ConfirmationModal from '../components/ConfirmationModal';
 import PageHeader from '../components/PageHeader';
 
 const FormsManagement = () => {
@@ -38,6 +39,8 @@ const FormsManagement = () => {
   const [rendererForm, setRendererForm] = useState<FormTemplate | null>(null);
   const [submitingForm, setSubmitingForm] = useState(false);
   const [isNewForm, setIsNewForm] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [formToDelete, setFormToDelete] = useState<number | null>(null);
 
   // Statistiques du dashboard
   const stats = {
@@ -91,23 +94,33 @@ const FormsManagement = () => {
     }))
   ];
 
-  const filteredForms = forms.filter(form => {
-    const matchesSearch = form.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      form.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = selectedType === 'all' || Number(form.type) === Number(selectedType);
-    return matchesSearch && matchesType;
-  });
+  const filteredForms = useMemo(() => {
+    return forms.filter(form => {
+      const matchesSearch =
+        form.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        form.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce formulaire ?')) {
-      return;
-    }
+      const matchesType =
+        selectedType === 'all' || Number(form.type) === Number(selectedType);
+
+      return matchesSearch && matchesType;
+    });
+  }, [forms, searchTerm, selectedType]);
+
+  const handleDeleteClick = (id: number) => {
+    setFormToDelete(id);
+    setShowDeleteConfirmation(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!formToDelete) return;
 
     try {
       setError(null);
-      await apiService.deleteForm(id);
-      setForms(forms => forms.filter(form => form.id !== id));
-      if (editingForm?.id === id) {
+      await apiService.deleteForm(String(formToDelete));
+      // Reload forms to ensure UI reflects the deletion
+      await loadData();
+      if (editingForm?.id === formToDelete) {
         setShowModal(false);
         setEditingForm(null);
         setShowPreview(false);
@@ -117,7 +130,15 @@ const FormsManagement = () => {
     } catch (err) {
       setError('Erreur lors de la suppression du formulaire');
       console.error('Erreur:', err);
+    } finally {
+      setShowDeleteConfirmation(false);
+      setFormToDelete(null);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirmation(false);
+    setFormToDelete(null);
   };
 
   const handleToggleActive = async (id: number) => {
@@ -126,7 +147,7 @@ const FormsManagement = () => {
       const form = forms.find(f => f.id === id);
       if (!form) return;
 
-      const updatedForm = await apiService.updateForm(id, { ...form, actif: !form.actif });
+      const updatedForm = await apiService.updateForm(String(id), { ...form, actif: !form.actif });
       if (!updatedForm) return;
 
       setForms(forms => forms.map(f => f.id === id ? updatedForm : f));
@@ -147,7 +168,7 @@ const FormsManagement = () => {
 
       if (!isNewForm && formData.id && forms.some(f => f.id === formData.id)) {
         // Update existing form
-        const updatedForm = await apiService.updateForm(Number(formData.id), formData);
+        const updatedForm = await apiService.updateForm(String(formData.id), formData);
         if (!updatedForm) throw new Error("Formulaire introuvable");
 
         setForms(forms => forms.map(f => f.id === formData.id ? updatedForm : f));
@@ -173,6 +194,7 @@ const FormsManagement = () => {
 
   const handleUpdateForm = useCallback((formData: FormTemplate) => {
     setPreviewForm(formData);
+
   }, []);
 
   const handleNewForm = () => {
@@ -192,7 +214,7 @@ const FormsManagement = () => {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     });
-  }
+  };
 
   return (
     <div className="min-h-screen text-gray-100">
@@ -205,9 +227,9 @@ const FormsManagement = () => {
         onActionClick={handleNewForm}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 py-4 sm:py-6 lg:py-8">
         {/* Dashboard Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -301,9 +323,9 @@ const FormsManagement = () => {
         ) : (
           <>
             {/* Search and Filter */}
-            <div className="bg-gray-800 rounded-md border border-gray-700 p-4 mb-8">
-              <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-                <div className="relative flex-1 max-w-md">
+            <div className="bg-gray-800 rounded-md border border-gray-700 p-3 sm:p-4 mb-6 sm:mb-8">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-between">
+                <div className="relative flex-1 w-full sm:max-w-md">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                   <input
                     type="text"
@@ -314,12 +336,12 @@ const FormsManagement = () => {
                   />
                 </div>
 
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
                   <Filter className="text-gray-500 w-5 h-5" />
                   <select
                     value={selectedType}
                     onChange={(e) => setSelectedType(e.target.value)}
-                    className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-100"
+                    className="px-3 sm:px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-100 w-full sm:w-auto"
                   >
                     {typeOptions.map((option) => (
                       <option key={option.value} value={option.value} className="bg-gray-800 text-gray-100">
@@ -332,7 +354,7 @@ const FormsManagement = () => {
             </div>
 
             {/* Forms Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
               {filteredForms.map((form, index) => {
                 const formType = formTypes.find(ft => Number(ft.id) === Number(form.type))?.icone ?? "Packages";
                 const TypeIcon = getDynamicIconComponent(formType);
@@ -344,22 +366,22 @@ const FormsManagement = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
-                    className={`bg-gray-800 rounded-md border border-gray-700 hover: border- gray-600 transition-all duration-300 ${!form.actif ? 'opacity-60' : ''} `}
+                    className={`bg-gray-800 rounded-md border border-gray-700 hover:border-gray-600 transition-all duration-300 ${!form.actif ? 'opacity-60' : ''}`}
                   >
-                    <div className="p-4">
+                    <div className="p-3 sm:p-4">
                       <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <div style={{ backgroundColor: colorIcon }} className={` w-8 h-8 rounded-md flex items-center justify-center text-white`}>
-                            <TypeIcon className="w-4 h-4" />
+                        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                          <div style={{ backgroundColor: colorIcon }} className="w-7 h-7 sm:w-8 sm:h-8 rounded-md flex items-center justify-center text-white flex-shrink-0">
+                            <TypeIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </div>
-                          <div>
-                            <h3 className="text-base font-semibold text-gray-100">{form.nom}</h3>
-                            <span style={{ backgroundColor: colorIcon }} className={` px-2 py-0.5 rounded-md text-xs font-medium text-white`}>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="text-sm sm:text-base font-semibold text-gray-100 truncate">{form.nom}</h3>
+                            <span style={{ backgroundColor: colorIcon }} className="inline-block px-1.5 sm:px-2 py-0.5 rounded-md text-xs font-medium text-white mt-1">
                               {formTypes.find((type) => Number(type.id) === Number(form.type))?.nom}
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
                           {form.actif ? (
                             <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                           ) : (
@@ -368,29 +390,29 @@ const FormsManagement = () => {
                         </div>
                       </div>
 
-                      <p className="text-gray-400 text-sm mb-3 line-clamp-2">{form.description}</p>
+                      <p className="text-gray-400 text-xs sm:text-sm mb-3 line-clamp-2">{form.description}</p>
 
-                      <div className="space-y-2 mb-3">
+                      <div className="space-y-1.5 sm:space-y-2 mb-3">
                         <div className="flex items-center space-x-2 text-xs text-gray-400">
-                          <FileText className="w-4 h-4" />
-                          <span>{form.champs.length} field(s)</span>
+                          <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                          <span className="truncate">{form.champs.length} field(s)</span>
                         </div>
                         <div className="flex items-center space-x-2 text-xs text-gray-400">
-                          <Mail className="w-4 h-4" />
+                          <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
                           <span className="truncate">{form.email_destination}</span>
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="flex items-center justify-between pt-3 border-t border-gray-700">
-                        <div className="flex space-x-2">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between pt-3 border-t border-gray-700 gap-2 sm:gap-0">
+                        <div className="flex space-x-1 sm:space-x-2">
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleToggleActive(Number(form.id))}
-                            className={`p-2 rounded-md transition-colors ${form.actif ? 'bg-blue-700 text-blue-200 hover:bg-blue-600' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'} `}
+                            className={`p-1.5 hidden sm:p-2 rounded-md transition-colors flex-1 sm:flex-none ${form.actif ? 'bg-blue-700 text-blue-200 hover:bg-blue-600' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'}`}
                           >
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </motion.button>
                           <motion.button
                             whileHover={{ scale: 1.1 }}
@@ -402,42 +424,44 @@ const FormsManagement = () => {
                               setShowPreview(true);
                               setIsNewForm(false);
                             }}
-                            className="p-2 bg-gray-700 text-gray-200 rounded-md hover:bg-gray-600 transition-colors"
+                            className="p-1.5 sm:p-2 bg-gray-700 text-gray-200 rounded-md hover:bg-gray-600 transition-colors flex-1 sm:flex-none"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </motion.button>
                           <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
-                            onClick={() => handleDelete(Number(form.id))}
-                            className="p-2 bg-red-950 text-red-400 rounded-md hover:bg-red-900 transition-colors"
+                            onClick={() => handleDeleteClick(Number(form.id))}
+                            className="p-1.5 sm:p-2 bg-red-950 text-red-400 rounded-md hover:bg-red-900 transition-colors flex-1 sm:flex-none"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </motion.button>
                         </div>
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-1 sm:space-x-2">
                           <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => {
                               setPreviewForm(form);
                               setShowPreview(true);
                               setIsNewForm(false);
                             }}
-                            className="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                            className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                            title="Preview Form"
                           >
-                            Preview
+                            <Eye className="w-4 h-4" />
                           </motion.button>
                           <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => {
                               setRendererForm(form);
                               setShowRenderer(true);
                             }}
-                            className="px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
+                            className="p-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                            title="Fill Form"
                           >
-                            Fill Form
+                            <FileText className="w-4 h-4" />
                           </motion.button>
                         </div>
                       </div>
@@ -532,6 +556,15 @@ const FormsManagement = () => {
           }}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirmation}
+        title="Delete Form"
+        message="Are you sure you want to delete this form? This action cannot be undone."
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   );
 };

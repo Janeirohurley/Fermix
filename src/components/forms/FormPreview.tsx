@@ -352,28 +352,33 @@ const FormPreview: React.FC<FormPreviewProps> = ({ form, onClose }) => {
             {groupFields.map((field, index) => {
               const FieldIcon = getFieldTypeIcon(field.type);
               return (
-                <motion.div
-                  key={field.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: (groupIndex * 3 + index) * 0.05 }}
-                  className="space-y-2"
-                >
-                  <label htmlFor={field.id} className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-md flex items-center justify-center bg-indigo-600">
-                      <FieldIcon className="w-4 h-4 text-white" />
-                    </div>
-                    {field.label}
-                    {field.obligatoire && <span className="text-red-400 ml-1">*</span>}
-                  </label>
-                  {renderField(field)}
-                  {errors[field.id] && (
-                    <div className="flex items-center gap-2 text-red-400 text-xs">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors[field.id]}
-                    </div>
-                  )}
-                </motion.div>
+                <>
+                  {renderField(field) !== null &&
+                    <motion.div
+                      key={field.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: (groupIndex * 3 + index) * 0.05 }}
+                      className="space-y-2"
+                    >
+                      <label htmlFor={field.id} className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-md flex items-center justify-center bg-indigo-600">
+                          <FieldIcon className="w-4 h-4 text-white" />
+                        </div>
+                        {field.label}
+                        {field.obligatoire && <span className="text-red-400 ml-1">*</span>}
+                      </label>
+                      {renderField(field)}
+                      {errors[field.id] && (
+                        <div className="flex items-center gap-2 text-red-400 text-xs">
+                          <AlertCircle className="w-4 h-4" />
+                          {errors[field.id]}
+                        </div>
+                      )}
+                    </motion.div>
+                  }
+                </>
+
               );
             })}
           </div>
@@ -458,34 +463,39 @@ const FormPreview: React.FC<FormPreviewProps> = ({ form, onClose }) => {
               const fieldTypeColor = 'bg-blue-600';
 
               return (
-                <motion.div
-                  key={field.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="space-y-2"
-                >
-                  <label htmlFor={field.id} className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <div className={`w-6 h-6 rounded-md flex items-center justify-center ${fieldTypeColor}`}>
-                      <FieldIcon className="w-4 h-4 text-white" />
-                    </div>
-                    {field.label}
-                    {field.obligatoire && <span className="text-red-400 ml-1">*</span>}
-                  </label>
-                  {renderField(field)}
-                  {errors[field.id] && (
-                    <div className="flex items-center gap-2 text-red-400 text-xs">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors[field.id]}
-                    </div>
-                  )}
-                  {field.validation?.customErrorMessage && !errors[field.id] && (
-                    <div className="flex items-center gap-2 text-blue-400 text-xs">
-                      <Info className="w-4 h-4" />
-                      {field.validation.customErrorMessage}
-                    </div>
-                  )}
-                </motion.div>
+                <>
+                  {renderField(field) !== null &&
+                    <motion.div
+                      key={field.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="space-y-2"
+                    >
+                      <label htmlFor={field.id} className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <div className={`w-6 h-6 rounded-md flex items-center justify-center ${fieldTypeColor}`}>
+                          <FieldIcon className="w-4 h-4 text-white" />
+                        </div>
+                        {field.label}
+                        {field.obligatoire && <span className="text-red-400 ml-1">*</span>}
+                      </label>
+                      {renderField(field)}
+                      {errors[field.id] && (
+                        <div className="flex items-center gap-2 text-red-400 text-xs">
+                          <AlertCircle className="w-4 h-4" />
+                          {errors[field.id]}
+                        </div>
+                      )}
+                      {field.validation?.customErrorMessage && !errors[field.id] && (
+                        <div className="flex items-center gap-2 text-blue-400 text-xs">
+                          <Info className="w-4 h-4" />
+                          {field.validation.customErrorMessage}
+                        </div>
+                      )}
+                    </motion.div>
+                  }
+                </>
+
               );
             })}
           </form>

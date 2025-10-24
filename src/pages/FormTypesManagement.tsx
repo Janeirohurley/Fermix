@@ -7,6 +7,7 @@ import PageHeader from '../components/PageHeader';
 import FormTypeCard from '../components/forms/FormTypeCard';
 import apiService from '../services/api';
 import ViewFormTypeCard from '../components/forms/ViewFormTypeCard';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const FormTypesManagement: React.FC = () => {
     const [formTypes, setFormTypes] = useState<FormType[]>([]);
@@ -15,6 +16,8 @@ const FormTypesManagement: React.FC = () => {
     const [activeCard, setActiveCard] = useState<{ type: 'add' | 'edit'; id?: string } | null>(null);
     const [isLoadingCreatingUpdating, setIsLoadingCreatingUpdating] = useState(false);
     const [toggling, setToggling] = useState(false);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const [formTypeToDelete, setFormTypeToDelete] = useState<string | null>(null);
 
     // Options de couleurs
     const colorOptions = [
@@ -64,16 +67,30 @@ const FormTypesManagement: React.FC = () => {
         }
     };
 
-    const handleDeleteFormType = async (id: string) => {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce type de formulaire ?')) return;
+    const handleDeleteClick = (id: string) => {
+        setFormTypeToDelete(id);
+        setShowDeleteConfirmation(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!formTypeToDelete) return;
+
         try {
             setError(null);
-            await apiService.deleteFormType(id);
-            setFormTypes(prev => prev.filter(ft => ft.id !== id));
+            await apiService.deleteFormType(formTypeToDelete);
+            setFormTypes(prev => prev.filter(ft => ft.id !== formTypeToDelete));
         } catch (err) {
             setError('Erreur lors de la suppression du type de formulaire');
             console.error('Erreur:', err);
+        } finally {
+            setShowDeleteConfirmation(false);
+            setFormTypeToDelete(null);
         }
+    };
+
+    const handleDeleteCancel = () => {
+        setShowDeleteConfirmation(false);
+        setFormTypeToDelete(null);
     };
 
     const handleToggleActive = async (formType: FormType) => {
@@ -170,7 +187,7 @@ const FormTypesManagement: React.FC = () => {
                                                 IconComponent={IconComponent}
                                                 onEdit={() => setActiveCard({ type: 'edit', id: ft.id })}
                                                 onToggleActive={() => handleToggleActive(ft)}
-                                                onDelete={() => handleDeleteFormType(ft.id)}
+                                                onDelete={() => handleDeleteClick(ft.id)}
                                                 toggling={toggling}
                                             />
                                         </motion.div>
@@ -193,9 +210,18 @@ const FormTypesManagement: React.FC = () => {
                                 </button>
                             </div>
                         )}
+
+
                     </>
                 )}
             </div>
+            <ConfirmationModal
+                isOpen={showDeleteConfirmation}
+                title="Delete Type Form"
+                message="Are you sure you want to delete this type of form? This action cannot be undone."
+                onConfirm={handleDeleteConfirm}
+                onCancel={handleDeleteCancel}
+            />
         </div>
     );
 };
