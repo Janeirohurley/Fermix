@@ -280,27 +280,23 @@ const FormRenderer: React.FC<Props> = ({
       // Render fields without groups
       return formFields.map((field, index) => {
         const FieldIcon = getFieldTypeIcon(field.type);
+        if (renderField(field) === null) return null;
         return (
-          <>
-            {renderField(field) !== null &&
-              <motion.div
-                key={field.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <label htmlFor={field.id} className=" text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-md flex items-center justify-center bg-blue-600">
-                    <FieldIcon className="w-4 h-4 text-white" />
-                  </div>
-                  {renderField(field) !== null && field.label}
-                  {field.obligatoire && <span className="text-red-400 ml-1">*</span>}
-                </label>
-                {renderField(field)}
-              </motion.div>
-            }
-          </>
-
+          <motion.div
+            key={field.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <label htmlFor={field.id} className=" text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md flex items-center justify-center bg-blue-600">
+                <FieldIcon className="w-4 h-4 text-white" />
+              </div>
+              {renderField(field) !== null && field.label}
+              {field.obligatoire && <span className="text-red-400 ml-1">*</span>}
+            </label>
+            {renderField(field)}
+          </motion.div>
         );
       });
     }
@@ -313,7 +309,8 @@ const FormRenderer: React.FC<Props> = ({
       const groupFields = formFields.filter((field) =>
         group.fields.includes(field.id) && !processedFields.has(field.id)
       );
-
+      const renderedFields = groupFields.map(renderField).filter(Boolean);
+      if (renderedFields.length === 0) return null;
       if (groupFields.length > 0) {
         groupedElements.push(
           <div key={group.id} className="space-y-4">

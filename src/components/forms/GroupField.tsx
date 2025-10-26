@@ -40,7 +40,7 @@ const GroupField: React.FC<GroupFieldProps> = ({
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* Bouton Créer un groupe */}
             <div className="flex justify-end">
                 <button

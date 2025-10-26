@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import type { FormField, FormGroup } from "./types/formTypes";
-import { GripVertical, Plus, Settings, Trash2, Link } from "lucide-react";
+import { GripVertical, Settings, Trash2, Link } from "lucide-react";
 import ValidationEditor from "./ValidationEditor";
 import FieldDependencies from "./FieldDependencies";
 import { getFieldTypeIcon, getFieldTypeLabel } from "./utils/utils";
+import FieldOptionsEditor from "./FieldOptionsEditor";
 
 interface FieldCardProps {
   field: FormField;
@@ -26,42 +27,11 @@ const FieldCard: React.FC<FieldCardProps> = ({
   onRemove,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showOptions, setShowOptions] = useState(
-    ["select", "checkbox", "radio"].includes(field.type)
-  );
+
 
   const FieldIcon = getFieldTypeIcon(field.type);
   const fieldTypeLabel = getFieldTypeLabel(field.type);
   const fieldTypeColor = "bg-blue-600";
-
-  // === Gestion des options ===
-  const addOption = () => {
-    const newOptions = [
-      ...(field.options || []),
-      {
-        label: `Option ${(field.options?.length || 0) + 1}`,
-        value: `option_${(field.options?.length || 0) + 1}`,
-      },
-    ];
-    onUpdate(index, { ...field, options: newOptions });
-  };
-
-  const updateOption = (optIndex: number, value: string) => {
-    if (!field.options) return;
-    const updatedOptions = [...field.options];
-    updatedOptions[optIndex] = {
-      ...updatedOptions[optIndex],
-      label: value,
-      value: value.toLowerCase().replace(/\s+/g, "_"),
-    };
-    onUpdate(index, { ...field, options: updatedOptions });
-  };
-
-  const removeOption = (optIndex: number) => {
-    if (!field.options) return;
-    const updatedOptions = field.options.filter((_, i) => i !== optIndex);
-    onUpdate(index, { ...field, options: updatedOptions });
-  };
 
   const handleTypeChange = (newType: string) => {
     const updatedField = { ...field, type: newType as any };
@@ -72,10 +42,8 @@ const FieldCard: React.FC<FieldCardProps> = ({
           { label: "Option 2", value: "option_2" },
         ];
       }
-      setShowOptions(true);
-    } else {
-      setShowOptions(false);
-    }
+      
+    } 
     onUpdate(index, updatedField);
   };
 
@@ -186,77 +154,12 @@ const FieldCard: React.FC<FieldCardProps> = ({
           </div>
 
           {/* Options */}
-          {showOptions && (
-            <div className="p-3 bg-gray-900  rounded-md space-y-2">
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-medium text-gray-300 flex items-center gap-1.5">
-                  <Settings className="w-3.5 h-3.5" />
-                  Options
-                </label>
-                <span className="text-xs text-gray-400 bg-gray-800 px-2 py-0.5 rounded-full">
-                  {(field.options || []).length} option(s)
-                </span>
-              </div>
 
-              {/* Direction d'affichage pour checkbox et radio */}
-              {(field.type === 'checkbox' || field.type === 'radio') && (
-                <div className="mb-3">
-                  <label className="block text-xs font-medium text-gray-300 mb-2">
-                    Direction d'affichage
-                  </label>
-                  <div className="flex gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name={`layout-${field.id}`}
-                        checked={field.layout === 'vertical' || !field.layout}
-                        onChange={() => onUpdate(index, { ...field, layout: 'vertical' })}
-                        className="w-4 h-4 text-blue-500 border-gray-600 bg-gray-700"
-                      />
-                      <span className="text-xs text-gray-300">Vertical</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name={`layout-${field.id}`}
-                        checked={field.layout === 'horizontal'}
-                        onChange={() => onUpdate(index, { ...field, layout: 'horizontal' })}
-                        className="w-4 h-4 text-blue-500 border-gray-600 bg-gray-700"
-                      />
-                      <span className="text-xs text-gray-300">Horizontal</span>
-                    </label>
-                  </div>
-                </div>
-              )}
+          <FieldOptionsEditor
+            field={field}
+            onChange={(updatedField) => onUpdate(index, updatedField)}
+          />
 
-              {(field.options || []).map((option, i) => (
-                <div key={i} className="flex items-center gap-2 group/option">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                  <input
-                    type="text"
-                    value={option.label}
-                    onChange={(e) => updateOption(i, e.target.value)}
-                    className="flex-1 px-2 py-1.5 bg-gray-700 border border-gray-600 rounded-md text-sm text-gray-100 focus:ring-1 focus:ring-blue-500"
-                  />
-                  <button
-                  type="button"
-                    onClick={() => removeOption(i)}
-                    className="p-1 text-red-400 hover:text-red-300 opacity-0 group-hover/option:opacity-100"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ))}
-              <button
-                onClick={addOption}
-                type="button"
-                className="mt-2 flex items-center gap-1.5 text-blue-400 text-xs hover:text-blue-300"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Ajouter une option
-              </button>
-            </div>
-          )}
 
           {/* Validation */}
           {!["select", "radio"].includes(field.type) && (

@@ -16,7 +16,8 @@ type ConditionType =
   | 'not_equals'
   | 'contains'
   | 'greater_than'
-  | 'less_than';
+  | 'less_than'
+  | 'equals_with_specific_value';
 
 interface ShowIfCondition {
   fieldId: string;
@@ -75,6 +76,7 @@ const FieldDependencies: React.FC<FieldDependenciesProps> = ({
       contains: 'contains',
       greater_than: 'is greater than',
       less_than: 'is less than',
+      equals_with_specific_value: 'is equal to specific value',
     };
     return labels[condition];
   };
@@ -101,6 +103,9 @@ const FieldDependencies: React.FC<FieldDependenciesProps> = ({
     if (['text', 'textarea'].includes(targetField.type)) {
       return [...base, { value: 'contains', label: 'contains' }];
     }
+    if (['checkbox', 'radio', 'select'].includes(targetField.type) && targetField.options && targetField.options.length > 0 && ['checkbox', 'radio', 'select'].includes(currentField.type)) {
+      return [...base, { value: 'equals_with_specific_value', label: 'equals with specific value to' }];
+    }
 
     return base;
   };
@@ -108,7 +113,6 @@ const FieldDependencies: React.FC<FieldDependenciesProps> = ({
   const renderValueInput = () => {
     const showIf = dependencies.showIf;
     if (!showIf?.fieldId) return null;
-
     const targetField = allFields.find((f) => f.id === showIf.fieldId);
     if (!targetField) return null;
 
@@ -150,7 +154,7 @@ const FieldDependencies: React.FC<FieldDependenciesProps> = ({
       />
     );
   };
-
+  console.log(currentField)
   return (
     <div className="mt-3 border border-gray-800 rounded-lg bg-gray-900 overflow-hidden">
       {/* Header */}
@@ -275,6 +279,7 @@ const FieldDependencies: React.FC<FieldDependenciesProps> = ({
                             </span>
                           </div>
                           <p className="text-xs text-gray-300">
+
                             Show "<strong>{currentField.label}</strong>" if "
                             <strong>
                               {
@@ -321,6 +326,7 @@ const FieldDependencies: React.FC<FieldDependenciesProps> = ({
                     </button>
                   </div>
                 )}
+               
 
                 {/* Examples */}
                 <div className="p-2 bg-gray-800 rounded-md border border-gray-700">

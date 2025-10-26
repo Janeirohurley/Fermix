@@ -249,7 +249,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, index, onUpdate, onRem
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Type Selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Type de champ</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Type de champ b</label>
             <select
               value={localField.type}
               onChange={(e) => updateField('type', e.target.value as ChampType)}

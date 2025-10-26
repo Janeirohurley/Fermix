@@ -8,7 +8,7 @@ export function shouldShowField(field: FormField, formData: Record<string, unkno
 
   switch (condition.condition) {
     case 'equals':
-      return targetValue === condition.value;
+      return targetValue == condition.value;
     case 'not_equals':
       return targetValue !== condition.value;
     case 'contains':

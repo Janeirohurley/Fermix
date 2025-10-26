@@ -354,7 +354,7 @@ const FormsManagement = () => {
             </div>
 
             {/* Forms Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
               {filteredForms.map((form, index) => {
                 const formType = formTypes.find(ft => Number(ft.id) === Number(form.type))?.icone ?? "Packages";
                 const TypeIcon = getDynamicIconComponent(formType);

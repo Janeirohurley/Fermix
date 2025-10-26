@@ -67,7 +67,7 @@ export interface ValidationRules {
   showIf?: {
     fieldId: string;
     value: unknown;
-    condition: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than';
+    condition: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than'| 'equals_with_specific_value';
   };
 }
 

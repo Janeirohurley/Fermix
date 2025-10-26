@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import type { FormField, FormTemplate, FormType, FormGroup } from "./types/formTypes";
 import FieldCard from "./FieldCard";
 import GroupField from "./GroupField";
+import CollapsibleComponent from "../DataAnalytics/CollapsibleComponent";
 
 const FormModal = ({
   form,
@@ -34,8 +35,7 @@ const FormModal = ({
 
   // ID du template (généré si création)
   const templateId = form?.id || Date.now().toString();
-console.log({templateId,form})
-  // === Prévisualisation en temps réel ===
+
   // === Prévisualisation en temps réel ===
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -247,32 +247,48 @@ console.log({templateId,form})
                 </div>
 
                 {/* Liste des FieldCard avec groupes */}
-                <div className="space-y-3 max-h-[50vh] overflow-y-auto scrollbar-custom">
-                  {fields.map((field, index) => (
-                    <FieldCard
-                      key={field.id}
-                      field={field}
-                      index={index}
-                      allFields={fields}
-                      templateId={templateId}
+                <CollapsibleComponent
+                  title="gestion des champs"
+                  defaultCollapsed={groupes.length > 0}
+                  className="border-0 mt-2  "
+                  headerClassName="hover:cursor-pointer rounded-md text-sm"
+                >
+                  <div className="space-y-3 ">
+
+                    {fields.map((field, index) => (
+                      <FieldCard
+                        key={field.id}
+                        field={field}
+                        index={index}
+                        allFields={fields}
+                        templateId={templateId}
+                        groupes={groupes}
+                        onUpdate={updateField}
+                        onRemove={removeField}
+                      />
+                    ))}
+                  </div>
+                </CollapsibleComponent>
+                {/* Gestion des groupes */}
+                <CollapsibleComponent
+                  title="Gestion des groupes de champs"
+                  defaultCollapsed={groupes.length > 0}
+                  className="border-0 mt-2 "
+                  headerClassName="hover:cursor-pointer rounded-md"
+                >
+                  <div className="mt-1">
+                    <GroupField
+                      champs={fields}
                       groupes={groupes}
-                      onUpdate={updateField}
-                      onRemove={removeField}
+                      onGroupCreate={handleGroupCreate}
+                      onGroupUpdate={handleGroupUpdate}
+                      onGroupAdd={handleGroupAdd}
+                      onGroupRemove={handleGroupRemove}
+                      onGroupDelete={handleGroupDelete}
                     />
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <h3 className="text-gray-200 font-semibold text-sm mb-2">Groupes existants</h3>
-                  <GroupField
-                    champs={fields}
-                    groupes={groupes}
-                    onGroupCreate={handleGroupCreate}
-                    onGroupUpdate={handleGroupUpdate}
-                    onGroupAdd={handleGroupAdd}
-                    onGroupRemove={handleGroupRemove}
-                    onGroupDelete={handleGroupDelete}
-                  />
-                </div>
+                  </div>
+                </CollapsibleComponent>
+
 
                 {/* Indicateur global des groupes */}
                 {groupes.length > 0 && (

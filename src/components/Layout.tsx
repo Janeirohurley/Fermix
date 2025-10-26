@@ -9,7 +9,8 @@ import {
     Menu,
     X,
     Download,
-    Upload
+    Upload,
+    BarChart3
 } from "lucide-react";
 import CustomTitleBar from "./CustomTitleBar";
 import ExportImportModal from "./ExportImportModal";
@@ -72,10 +73,23 @@ export default function Layout() {
                                     : "text-gray-300 hover:bg-blue-700 hover:text-white"
                                 } `
                             }
-                            title="Tableau de bord"
+                            title="Dashboard"
                         >
                             <LayoutDashboard className="w-5 h-5 flex-shrink-0" />
-                            {!isSidebarCollapsed && <span>Tableau de bord</span>}
+                            {!isSidebarCollapsed && <span>Dashboard</span>}
+                        </NavLink>
+                        <NavLink
+                            to="/data-visualization"
+                            className={({ isActive }) =>
+                                `flex items-center gap-3 px-3 py-2 rounded-md transition-all ${isActive
+                                    ? "bg-blue-600 text-white"
+                                    : "text-gray-300 hover:bg-blue-700 hover:text-white"
+                                } `
+                            }
+                            title="Data Visualization"
+                        >
+                            <BarChart3 className="w-5 h-5 flex-shrink-0" />
+                            {!isSidebarCollapsed && <span>Data Visualization</span>}
                         </NavLink>
 
                         <NavLink
@@ -86,10 +100,10 @@ export default function Layout() {
                                     : "text-gray-300 hover:bg-blue-700 hover:text-white"
                                 } `
                             }
-                            title="Formulaires"
+                            title="Forms"
                         >
                             <FileText className="w-5 h-5 flex-shrink-0" />
-                            {!isSidebarCollapsed && <span>Formulaires</span>}
+                            {!isSidebarCollapsed && <span>Forms</span>}
                         </NavLink>
 
                         <NavLink
@@ -100,11 +114,13 @@ export default function Layout() {
                                     : "text-gray-300 hover:bg-blue-700 hover:text-white"
                                 } `
                             }
-                            title="Types de formulaires"
+                            title="Form Types"
                         >
                             <FolderOpen className="w-5 h-5 flex-shrink-0" />
-                            {!isSidebarCollapsed && <span>Types de formulaires</span>}
+                            {!isSidebarCollapsed && <span>Form Types</span>}
                         </NavLink>
+
+                     
 
                         <NavLink
                             to="/settings"
@@ -114,10 +130,10 @@ export default function Layout() {
                                     : "text-gray-300 hover:bg-blue-700 hover:text-white"
                                 } `
                             }
-                            title="Paramètres"
+                            title="Settings"
                         >
                             <Settings className="w-5 h-5 flex-shrink-0" />
-                            {!isSidebarCollapsed && <span>Paramètres</span>}
+                            {!isSidebarCollapsed && <span>Settings</span>}
                         </NavLink>
                     </nav>
 
@@ -131,7 +147,7 @@ export default function Layout() {
                                 <button
                                     onClick={openExportImportModal}
                                     className="flex items-center gap-2 px-3 py-2 w-full text-left text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
-                                    title="Import/Export des données"
+                                    title="Import/Export"
                                 >
                                     <Download className="w-4 h-4" />
                                     <Upload className="w-4 h-4" />
@@ -147,7 +163,7 @@ export default function Layout() {
                                 <button
                                     onClick={openExportImportModal}
                                     className="flex items-center justify-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition-colors"
-                                    title="Import/Export des données"
+                                    title="Import/Export"
                                 >
                                     <Download className="w-4 h-4" />
                                 </button>
